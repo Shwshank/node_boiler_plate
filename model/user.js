@@ -1,7 +1,7 @@
 const mongoose = require('mongoose');
 
 // Article Schema
-let userCollection = mongoose.Schema({
+let userCollection1 = mongoose.Schema({
   name:{
     type: String,
     required: true,
@@ -13,4 +13,4 @@ let userCollection = mongoose.Schema({
   }
 });
 
-let user = module.exports = mongoose.model('userCollection1',userCollection);
+let user = module.exports = mongoose.model('userCollection1',userCollection1);

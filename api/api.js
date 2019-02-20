@@ -1,4 +1,4 @@
-module.exports = (app, userCollection, bcrypt, jwt, saltRounds) => {
+module.exports = (app, userCollection, bcrypt, jwt, saltRounds, upload) => {
 
   app.get('/',(req, res)=> res.send('Hello Express!'));
 
@@ -64,7 +64,53 @@ module.exports = (app, userCollection, bcrypt, jwt, saltRounds) => {
 
   });
 
-  app.post('/update', (res, req) => {
-    console.log(res.body.data);
+  app.post('/update', (res, req) =>{
+    console.log(res.body);
+    userCollection.findOneAndUpdate(
+      {name: res.body.name},
+      {password: 123},
+      {new: true},
+      (err, doc)=>{
+        if (err) console.log("Something wrong when updating data!");
+        console.log(doc);
+        req.send(doc)
+      });
   });
+
+  app.post('/findById', (res, req) =>{
+    var id;
+    console.log(res.body.id);
+    id = res.body.id;
+    userCollection.findOne({name: "name01"}).then(err=>{
+      console.log(err);
+    }, res1=>{
+      console.log(res1);
+    })
+
+  });
+
+  app.get('/findAll', (res, req)=>{
+    userCollection.find().then(res=>{
+      console.log(res);
+    }, err=>{
+      console.log(err);
+    })
+  })
+
+  app.post('/delete', (res, req) =>{
+
+    var id = res.body.id;
+
+    userCollection.find({_id:id}).deleteOne(err=>{
+      console.log(err);
+    }, res=>{
+      console.log(res);
+    })
+  })
+
+  app.post('/upload', upload.single('data'), (req, res) =>{
+    console.log(req);
+    res.send("Got it")
+  })
+
 }
