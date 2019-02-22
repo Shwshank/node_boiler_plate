@@ -1,33 +1,49 @@
-module.exports = (app, userCollection, bcrypt, jwt, saltRounds, upload) => {
+module.exports = (app, userCollection, bcrypt, jwt, saltRounds, upload, _) => {
 
   app.get('/',(req, res)=> res.send('Hello Express!'));
 
   app.post('/',  (req, response)=>{
 
     console.log(req.body);
+    try{
 
-    userCollection.findOne({name:req.body.name})
-    .then(res=>{
-      if(res){
-        console.log(res);
-        response.send("User exists!");
+      if(!_.has(req.body, ['name','password'])) {
+        response.send("Please check request body")
       }
-      else {
 
-        bcrypt.hash(req.body.password, saltRounds).then(function(hash) {
-          new userCollection({
-            name: req.body.name,
-            password: hash,
-          }).save()
-        });
+      userCollection.findOne({name:req.body.name})
+      .catch(err=>{
+        console.log(233);
+      })
+      .then(res=>{
+        if(res){
+          console.log(res);
+          response.send("User exists!");
+        }
+        else {
 
-        var tempJWT =  jwt.sign({
-          exp: Math.floor(Date.now() / 1000) + (60 * 60),
-          data: req.body.name
-        }, 'secret');
-        response.send("jwt: "+tempJWT);
-      }
-    })
+          bcrypt.hash(req.body.password, saltRounds).then(function(hash) {
+            new userCollection({
+              name: req.body.name,
+              password: hash,
+            }).save()
+          });
+
+          // var tempJWT =  jwt.sign({
+          //   exp: Math.floor(Date.now() / 1000) + (60 * 60),
+          //   data: req.body.name
+          // }, 'secret');
+          // response.send("jwt: "+tempJWT);
+        }
+      }, err=>{
+        console.log("1111");
+      }).catch( err=>{
+        console.log("1111");
+      });
+    } catch(err) {
+      console.log(err);
+    }
+
 
   });
 
@@ -112,5 +128,27 @@ module.exports = (app, userCollection, bcrypt, jwt, saltRounds, upload) => {
     console.log(req);
     res.send("Got it")
   })
+
+  app.post('/date', (res, request) =>{
+
+    console.log(res.body);
+    var now = new Date();
+    var isoString = now.toISOString();
+    console.log(isoString);
+    var saveData = new userCollection({
+      name: res.body.name,
+      password: res.body.password,
+      date: isoString
+    });
+
+    saveData.save().then(res=>{
+      console.log("res "+res);
+      request.send("res "+res);
+    }, err=>{
+      console.log("err "+err);
+      request.send("err "+err);
+    })
+
+  });
 
 }

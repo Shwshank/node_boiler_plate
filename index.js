@@ -8,6 +8,8 @@ const morgan = require('morgan')
 const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken');
 const multer  = require('multer')
+var _ = require('lodash');
+
 var storage = multer.diskStorage({
     destination: (req, file, cb) => {
       cb(null, './uploads')
@@ -39,5 +41,5 @@ db.once('open',()=>{
 })
 app.use(bodyParser.json());
 app.use(morgan('dev'))
-api(app, userCollection1, bcrypt, jwt, saltRounds, upload)
+api(app, userCollection1, bcrypt, jwt, saltRounds, upload, _)
 app.listen(port, () => console.log(`Example app listening on port ${port}`))
